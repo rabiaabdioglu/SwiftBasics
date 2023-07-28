@@ -23,6 +23,11 @@
   - [State And Binding](#state-and-binding)
   - [Observable And Observed](#observable-and-observed)
   - [State And Event Handling](#state-and-event-handling)
+  - [Views Within Views](#views-within-views)
+  - [Controls Cheat Sheet](#controls-cheat-sheet)
+  - [Frame And Layouts](#frame-and-layouts)
+  - [Hierarchical Navigation](#hierarchical-navigation)
+  - [Tabbed Navigation](#tabbed-navigation)
 
 
 
@@ -1042,21 +1047,35 @@ struct MainView: View {
     }
 } 
 ```
-####  Controls cheat sheet
+####  Controls Cheat Sheet
 
 
 ######  Some of the most commonly used controls include Button, Toggle, Stepper, Slider, ProgressView, DatePicker and Label. 
 
 
 ```swift
-   NavigationView {
-            VStack (spacing: 30){
-                
+  struct ControlView: View {
+    @State private var valueForStepper = 1
+    @State private var isShowingToggle = true
+    @State private var sizeForSlider: CGFloat = 0.1
+    @State private var selectedColor = "Red"
+    @State private var selectedDate = Date()
+    let colors = ["Red", "Blue", "Green", "Yellow"]
+
+    var dateClosedRange: ClosedRange<Date> {
+        let min = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        let max = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        return min...max
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack (spacing: 30) {
                 Label("Logo", systemImage: "book")
                     .labelStyle(.titleAndIcon)
                 
-                Spacer()
-                
+             
+
                 Button(role: .destructive) {
                     print("cancel button clicked")
                 } label: {
@@ -1065,29 +1084,27 @@ struct MainView: View {
                         Text("")
                     }
                 }
-                Spacer()
+
+
                 Toggle(isOn: $isShowingToggle) {
                     Text("Hello World")
                 }
+
                 
-                
-                Spacer()
                 HStack {
-                    
-                    Text("Number of book: \(valueForStepper)")
-                    Stepper("", value: $valueForStepper, in:1...20)
-                    
+                    Text("Number of books: \(valueForStepper)")
+                    Stepper("", value: $valueForStepper, in: 1...20)
                 }
-                Spacer()
-                
+
+
                 HStack {
                     VStack {
                         Text("Little Lemon").font(.system(size: sizeForSlider * 50))
                         Slider(value: $sizeForSlider)
-                        
                     }
                     .padding()
                 }
+                
                 Form {
                     Section {
                         DatePicker(
@@ -1097,21 +1114,32 @@ struct MainView: View {
                             label: { Text("Due Date") }
                         )
                     }
-                    
                 }
                 
                 
-            }.padding(30)
+                Picker("Color", selection: $selectedColor) {
+                    ForEach(colors, id: \.self) { color in
+                        Text(color)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Text("You selected: \(selectedColor)")
+
+            }
+            .padding(30)
         }
+    }
+}
+
 
 
 ```
 ######  Preview of above codes 
+
 <div style="text-align:center;">
-  <img height="500" alt="Screenshot" src="https://github.com/rabiaabdioglu/SwiftBasics/assets/75799790/f6f191cb-d7b5-443f-95fd-af09112d1442">
+  <img height="500" alt="Screenshot" src="https://github.com/rabiaabdioglu/SwiftBasics/assets/75799790/83c17ddc-1506-49eb-8259-6b114a626e68">
 </div>
 ```
- ####  Controls cheat sheet
 
 
 ######  Simple Date Picker and Button Usage
@@ -1146,7 +1174,101 @@ struct Birthday: View {
 
 ```
 
+####  Views Within Views
+
+
+```swift
+
+
+struct ChildView: View {
+
+    @Binding var showBook :Bool
+    var body: some View {
+        VStack(spacing: 30) {
+            if showBook {
+                Image(systemName: "book.fill")
+                    .foregroundColor(.green)
+            }
+            else{
+                Image(systemName: "book.closed")
+                    .foregroundColor(.green)
+            }
+            Button( action: {
+                showBook.toggle()
+            },label:{
+                Text(showBook ? "Close Book" : "Open Book")
+            })
+            
+        }
+    }
+}
+
+struct ParentView: View {
+
+    @State var showBook = true
+    var body: some View {
+    
+            ChildView(showBook: $showBook)
+    }
+}
 
 
 
 
+```
+####  Hierarchical Navigation
+
+###### Hierarchical navigation in SwiftUI allows users to move through different levels of content using NavigationView and NavigationLink. With NavigationView, you can create a stack of views, and NavigationLink defines the links to other views. SwiftUI handles the navigation, providing a back button to go back to the previous view.
+
+
+```swift
+
+struct ContentView: View {
+    var body: some View {
+        var elements = ["Page1", "Page2"]
+        let colors = [Color.pink, Color.orange]
+        
+            NavigationView {
+                VStack {
+                    Text("Select page:")
+                        .font(.title)
+                    
+                    ForEach(elements.indices, id: \.self) { index in
+                        NavigationLink(destination: Text(elements[index]).font(.title).foregroundColor(colors[index])) {
+                            Text(elements[index])
+                                .font(.title)
+                                .foregroundColor(colors[index])
+                        }
+                    }
+                }
+                .navigationTitle("Hierarchical navigation")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }}
+```
+
+####    Tabbed Navigation
+
+###### Tabbed navigation organizes app content into multiple tabs, enabling users to switch between sections easily. In SwiftUI, you can implement it using TabView, presenting a tab bar at the bottom for navigation between different views associated with each tab.
+
+```swift
+
+struct ContentView: View {
+    var body: some View {
+        TabView{
+            Text("Home Page")
+                .font(.title)
+                .tabItem({
+                    Label("Home",systemImage: "house")
+                })
+            Text("Profile")
+                .font(.title)
+                .tabItem({
+                    Label("Profile",systemImage: "person")
+                })
+        }
+    }
+}
+```
+
+#### ScrollView and List
