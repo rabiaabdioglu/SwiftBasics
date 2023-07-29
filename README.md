@@ -30,7 +30,16 @@
   - [Tabbed Navigation](#tabbed-navigation)
   - [ScrollView and List](#scrollview-and-list)
   - [Gestures](#gestures)
-
+- [Advanced Programming in Swift](#advanced-programming-in-swift)
+  - [Enum](#enum)
+  - [Sets](#sets)
+  - [Access-level Modifiers](#access-level-modifiers)
+  - [Typecasting](#typecasting)
+  - [Polymorphism](#polymorphism)
+  - [Protocol](#protocol)
+  - [Optional Protocol](#optional-protocol)
+  - [Property and newValue](#property-and-newvalue)
+  - [didSet](#didset)
 
 
 ## Swift Basics
@@ -1019,34 +1028,31 @@ struct ContentView: View {
 ```
 ###### Simple example with ZStack
 
-```swift
-struct MainView: View {
+```swiftstruct MainView: View {
     var body: some View {
         NavigationView {
-            VStack {
-                ZStack {
-                    HStack(spacing: 8) {
-                        Text("Demo").scaledToFit().frame(
-                            width: 100, height: 100, alignment: .center)
-                        VStack(spacing: 10) {
-                            Text("Little Lemon").font(.title)
-                            Text("Tomato Tortellini, Bottarga and Carbonara ").font(.title3)
-                                .multilineTextAlignment(.center)
-                        }// :- VStack
-                            .padding()
-                            .frame(width: 300)
-                            .background(Color.yellow)
-                    }  // :- HStack
+            ZStack {
+                HStack(spacing: 8) {
+                    Text("Pink").scaledToFit().frame(
+                        width: 100, height: 100, alignment: .center)
+                    VStack(spacing: 10) {
+                        Text("Yellow").font(.title)
+                        Text("List  For VStack ").font(.title3)
+                            .multilineTextAlignment(.center)
+                    }// :- VStack
                     .padding()
-                    .frame(width: 400)
-                    .background(Color.pink)
-                }  // :- ZStack
-                .frame(width: 500)
-                .background(Color.orange)
-            }
+                    .frame(width: 300)
+                    .background(Color.yellow)
+                }  // :- HStack
+                .padding()
+                .frame(width: 400)
+                .background(Color.pink)
+            }  // :- ZStack
+            .frame(width: 500)
+            .background(Color.orange)
         }
     }
-} 
+}
 ```
 ####  Controls Cheat Sheet
 
@@ -1100,7 +1106,7 @@ struct MainView: View {
 
                 HStack {
                     VStack {
-                        Text("Little Lemon").font(.system(size: sizeForSlider * 50))
+                        Text("Changable Text").font(.system(size: sizeForSlider * 50))
                         Slider(value: $sizeForSlider)
                     }
                     .padding()
@@ -1523,3 +1529,538 @@ struct MagnificationExample: View {
 
 ```
 
+## Advanced Programming in Swift
+
+#### Enum
+
+ 
+###### Raw values are pre-defined values that are associated with each case and have the same type
+
+```swift
+enum Weekday: Int {
+    case monday = 1
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+    case saturday
+    case sunday
+}
+
+```
+ 
+###### Enumerations can also have associated values, which allow each case to hold additional data of varying types.
+
+```swift
+enum Contact {
+    case phone(String)
+    case email(String)
+    case address(String, Int)
+}
+```
+ 
+###### To create instances of this enumeration:
+
+```swift
+let contact1 = Contact.phone("+1 123-456-7890")
+let contact2 = Contact.email("example@example.com")
+let contact3 = Contact.address("Main Street", 123)
+
+```
+ 
+###### Enum example 
+
+```swift
+import Foundation
+
+// Enum for Pasta Types
+enum PastaType: String {
+    case spaghetti
+    case penne
+    case ravioli
+    case rigatoni
+}
+
+// Enum for Pasta Cooking Status
+enum CookingStatus {
+    case cooked
+    case uncooked
+}
+
+// Function to Check if Pasta is Cooked
+func checkIfCooked(pasta: PastaType, cookingTime: Int) -> CookingStatus {
+    switch pasta {
+    case .spaghetti where cookingTime >= 8:
+        return .cooked
+    case .penne where cookingTime >= 10:
+        return .cooked
+    case .ravioli where cookingTime >= 11:
+        return .cooked
+    case .rigatoni where cookingTime >= 12:
+        return .cooked
+    default:
+        return .uncooked
+    }
+}
+
+// Sample Usage
+let pastaType = PastaType.spaghetti
+let cookingTime = 7
+let cookingStatus = checkIfCooked(pasta: pastaType, cookingTime: cookingTime)
+
+switch cookingStatus {
+case .cooked:
+    print("\(pastaType.rawValue.capitalized) is cooked, take it out of the water!")
+case .uncooked:
+    print("\(pastaType.rawValue.capitalized) is not cooked.")
+}
+
+```
+ 
+###### Enum example 
+
+```swift
+//associated
+enum ComputerType: String {
+    case laptop = "Laptop"
+    case desktop = "Desktop"
+    case tablet = "Tablet"
+}
+//raw value
+enum RAMSize: Int {
+    case twoGB = 2
+    case fourGB = 4
+    case eightGB = 8
+    case sixteenGB = 16
+    case thirtyTwoGB = 32
+}
+
+struct Computer {
+    let type: ComputerType
+    let ramSize: RAMSize
+}
+
+let laptopComputer = Computer(type: .laptop, ramSize: .eightGB)
+
+switch laptopComputer.type {
+case .laptop:
+    print("This is a \(laptopComputer.type.rawValue) with \(laptopComputer.ramSize.rawValue)GB RAM.")
+case .desktop:
+    print("This is a desktop with \(laptopComputer.ramSize.rawValue)GB RAM.")
+case .tablet:
+    print("This is a tablet with \(laptopComputer.ramSize.rawValue)GB RAM.")
+}
+
+```
+ 
+#### Sets 
+###### In Swift, a Set is a collection type used to store unique elements. It resembles an array but allows each element to be stored only once, ensuring data uniqueness. Sets are unordered and can be used for efficient handling of non-repeated values.
+
+```swift
+
+let fruits: Set<String> = ["Apple", "Orange", "Banana", "Apple", "Grapes", "Banana"]
+
+
+```
+
+<div style="text-align:center;">
+  <img width="500" alt="Screenshot" src="https://github.com/rabiaabdioglu/SwiftBasics/assets/75799790/77a4d8b3-e686-4249-8a2f-d9a9b803e79f">
+</div>
+
+
+###### Example usage of Sets 
+
+```swift
+
+var numberSet: Set<Int> = []
+var numberSet2: Set<Int> = [1,20,30,4,5]
+
+numberSet.insert(10)
+numberSet.insert(20)
+numberSet.insert(30)
+numberSet.insert(20)
+numberSet.insert(30)
+// Output: [30, 10, 20]
+print(numberSet)
+
+numberSet.remove(10)
+
+// Output: [30, 20]
+print(numberSet)
+
+if numberSet.contains(20) {
+    numberSet.update(with: 25)
+}
+
+// Output: [30, 25]
+print(numberSet)
+print(numberSet.count)
+let numberUnion = numberSet.union(numberSet2)
+
+// Output: [7, 4, 5, 6, 8, 1, 2, 3]
+print(numberUnion)
+
+
+```
+ 
+#### Access-level Modifiers 
+
+###### private - Allows the code within a code definition to access the code.
+
+###### fileprivate - Allows the defining source file to access the code.
+
+###### internal - Allows source files from the defining module to access the code.
+
+###### public - Allows source files from other modules to access the code, however, other modules can’t subclass and override classes.
+
+###### open - Allows source files from other modules to access the code. Other modules can subclass and override classes.
+```swift
+
+// ModuleA.swift
+public struct Person {
+    // Public property accessible from any module that imports ModuleA
+    public var name: String
+    
+    // Internal property accessible within the same module (ModuleA)
+    internal var age: Int
+    
+    // File-private property accessible only within this source file
+    fileprivate var address: String
+    
+    // Private property accessible only within the Person struct
+    private var phoneNumber: String
+    
+    public init(name: String, age: Int, address: String, phoneNumber: String) {
+        self.name = name
+        self.age = age
+        self.address = address
+        self.phoneNumber = phoneNumber
+    }
+}
+
+// ModuleB.swift
+import ModuleA
+
+// Accessing public properties from ModuleA
+let personA = Person(name: "John", age: 30, address: "123 Main St", phoneNumber: "555-1234")
+print(personA.name) // Accessible
+print(personA.age) // Not accessible (different module)
+
+// Accessing internal properties from ModuleA
+print(personA.address) // Not accessible (different source file)
+print(personA.phoneNumber) // Not accessible (private)
+
+
+```
+
+
+#### Typecasting 
+
+###### Typecasting in Swift allows flexible programming by converting between different data types. It involves upcasting and downcasting operations for seamless transitions
+ 
+
+```swift
+// Upcasting: Converting a subclass instance to its superclass type
+class Vehicle { }
+class Car: Vehicle { }
+
+let myCar = Car()
+let vehicle: Vehicle = myCar // Upcasting
+
+// Downcasting: Converting a superclass instance to its subclass type
+if let car = vehicle as? Car {
+    print("Successfully downcasted to Car type.")
+} else {
+    print("Downcasting failed.")
+}
+
+
+```
+ 
+#### Polymorphism 
+###### Polymorphism is the ability of objects of different classes to be treated as objects of a common superclass.
+
+
+```swift
+
+class Animal {
+    func makeSound() {
+        print("Unknown sound")
+    }
+}
+
+class Dog: Animal {
+    override func makeSound() {
+        print("Woof!")
+    }
+}
+
+class Cat: Animal {
+    override func makeSound() {
+        print("Meow!")
+    }
+}
+
+let animals: [Animal] = [Dog(), Cat(), Dog(), Cat()]
+
+for animal in animals {
+    if let dog = animal as? Dog {
+        dog.makeSound() // Calls the Dog's makeSound() method
+    } else if let cat = animal as? Cat {
+        cat.makeSound() // Calls the Cat's makeSound() method
+    } else {
+        animal.makeSound() // Calls the default makeSound() method in Animal class
+    }
+}
+
+
+```
+ 
+###### Example that combines polymorphism, typecasting, access control, and subclassing  
+
+```swift
+
+
+
+class ElectronicDevice {
+    private(set) var brand: String
+    private var storageCapacity: Int
+    
+    init(brand: String, storageCapacity: Int) {
+        self.brand = brand
+        self.storageCapacity = storageCapacity
+    }
+    
+    func printInfo() {
+        print("Brand: \(brand)")
+        print("Storage Capacity: \(storageCapacity) GB")
+    }
+}
+
+class Computer: ElectronicDevice {
+    private var cpuModel: String
+    
+    init(brand: String, storageCapacity: Int, cpuModel: String) {
+        self.cpuModel = cpuModel
+        super.init(brand: brand, storageCapacity: storageCapacity)
+    }
+    
+    override func printInfo() {
+        super.printInfo()
+        print("CPU Model: \(cpuModel)")
+    }
+}
+
+class Tablet: ElectronicDevice {
+    private var screenSize: Double
+    
+    init(brand: String, storageCapacity: Int, screenSize: Double) {
+        self.screenSize = screenSize
+        super.init(brand: brand, storageCapacity: storageCapacity)
+    }
+    
+    override func printInfo() {
+        super.printInfo()
+        print("Screen Size: \(screenSize) inches")
+    }
+}
+
+class Smartphone: ElectronicDevice {
+    private var hasFaceRecognition: Bool
+    
+    init(brand: String, storageCapacity: Int, hasFaceRecognition: Bool) {
+        self.hasFaceRecognition = hasFaceRecognition
+        super.init(brand: brand, storageCapacity: storageCapacity)
+    }
+    
+    override func printInfo() {
+        super.printInfo()
+        print("Face Recognition: \(hasFaceRecognition ? "Yes" : "No")")
+    }
+}
+
+let computer = Computer(brand: "ABC Computers", storageCapacity: 512, cpuModel: "Intel Core i5")
+let tablet = Tablet(brand: "XYZ Tablets", storageCapacity: 256, screenSize: 10.5)
+let smartphone = Smartphone(brand: "Phone Inc.", storageCapacity: 128, hasFaceRecognition: true)
+
+let devices: [ElectronicDevice] = [computer, tablet, smartphone]
+
+for device in devices {
+    device.printInfo()
+    print("------")
+}
+
+```
+ 
+#### Protocol
+###### Protocols in Swift define a blueprint of methods, properties, and other requirements that a class or struct must adhere to. They allow for the creation of generic code, enabling different types to conform to the same protocol, facilitating polymorphism and code reusability.
+
+```swift
+// Define a protocol named Animal
+protocol Animal {
+    var name: String { get }
+    var sound: String { get }
+    
+    func makeSound()
+}
+
+// Create a class conforming to the Animal protocol
+class Dog: Animal {
+    var name: String
+    var sound: String
+    
+    init(name: String) {
+        self.name = name
+        self.sound = "Woof"
+    }
+    
+    func makeSound() {
+        print("\(name) says \(sound)")
+    }
+}
+
+// Create another class conforming to the Animal protocol
+class Cat: Animal {
+    var name: String
+    var sound: String
+    var weight: Int
+    
+    init(name: String, weight: Int) {
+        self.name = name
+        self.sound = "Meow"
+        self.weight = weight
+    }
+    
+    func makeSound() {
+        print("\(name) says \(sound)")
+    }
+}
+
+// Usage of the protocol
+let dog = Dog(name: "Buddy")
+let cat = Cat(name: "Whiskers", weight: 5)
+
+dog.makeSound() // Output: Buddy says Woof
+cat.makeSound() // Output: Whiskers says Meow
+print(cat.weight)
+
+```
+ 
+#### Optional Protocol
+###### There is a music app that can play different types of media (songs, podcasts and audiobooks). There is a Player class that can execute these different media types, and also other classes should notify when a media item has finished playing. That's why @objc is used.
+  
+```swift
+// Step 1: Define the PlayerDelegate protocol
+@objc protocol PlayerDelegate {
+    func playerDidFinishPlaying()
+    @objc optional func playerDidEncounterError(error: Error)
+}
+
+// Step 2: Create the Player class
+class Player {
+    var delegate: PlayerDelegate?
+    
+    func playMedia() {
+        // Simulate media playback
+        print("Playing media...")
+        
+        // Simulate media playback finishing
+        delegate?.playerDidFinishPlaying()
+        
+        // Simulate an error during playback
+        let error = NSError(domain: "com.example.musicapp", code: 100, userInfo: [NSLocalizedDescriptionKey: "An error occurred during playback."])
+        delegate?.playerDidEncounterError?(error: error)
+    }
+}
+
+// Step 3: Conform to the PlayerDelegate protocol in another class
+class NowPlayingViewController: PlayerDelegate {
+    func playerDidFinishPlaying() {
+        print("Now Playing View: Media finished playing.")
+        // Update UI with the currently playing media information
+    }
+    
+    func playerDidEncounterError(error: Error) {
+        print("Now Playing View: Encountered error during playback - \(error.localizedDescription)")
+        // Show an error message to the user
+    }
+}
+
+// Step 4: Instantiate the Player and NowPlayingViewController
+let player = Player()
+let nowPlayingViewController = NowPlayingViewController()
+
+// Step 5: Set the NowPlayingViewController as the delegate of the Player
+player.delegate = nowPlayingViewController
+
+// Step 6: Play the media
+player.playMedia()
+
+```
+ 
+#### Property and newValue
+
+```swift
+
+class Table {
+    private var _area: Double = 0.0
+    
+    var area: Double {
+        get {
+            return _area
+        }
+        set(newValue) {
+            if newValue < 0 {
+                print("Warning: Table area cannot be negative. Setting it to zero.")
+                _area = 0
+            } else {
+                _area = newValue
+            }
+        }
+    }
+}
+
+let table = Table()
+table.area = 120.0
+print("Table Area: \(table.area)") // Output: Table Area: 120.0
+table.area = -50.0 // Output: Warning: Table area cannot be negative. Setting it to zero.
+
+print("Table Area: \(table.area)") // Output: Table Area: 0.0 (because it was set to zero in the set block)
+
+table.area = 80.0
+print("Table Area: \(table.area)") // Output: Table Area: 80.0
+
+```
+ 
+#### didSet 
+
+```swift
+
+
+class Table {
+    var size: Int {
+        didSet {
+            if size < 4 {
+                print("Warning: The table size is too small.")
+            } else {
+                print("Table size is set to \(size).")
+            }
+        }
+    }
+    
+    init(size: Int) {
+        self.size = size
+    }
+}
+
+let table = Table(size: 6)
+table.size = 3
+print("Table size: \(table.size)")
+// Output: Table size: 3 (the didSet block prevented it from being set to a smaller value)
+
+
+
+
+
+```
+ 
