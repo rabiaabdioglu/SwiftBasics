@@ -28,7 +28,8 @@
   - [Frame And Layouts](#frame-and-layouts)
   - [Hierarchical Navigation](#hierarchical-navigation)
   - [Tabbed Navigation](#tabbed-navigation)
-
+  - [ScrollView and List](#scrollview-and-list)
+  - [Gestures](#gestures)
 
 
 
@@ -1272,3 +1273,253 @@ struct ContentView: View {
 ```
 
 #### ScrollView and List
+
+
+###### Food Calories Guide
+
+###### This example allows users to explore a list of food items and their corresponding calorie information. Users can navigate through the list and select a food item to view more detailed calorie information on a separate page.
+
+```swift
+
+struct FoodItem: Identifiable {
+    let id = UUID()
+    let name: String
+    let calories: Int
+}
+
+struct ListAndScrollView: View {
+    let foodItems = [
+        FoodItem(name: "Pizza", calories: 300),
+        FoodItem(name: "Salad", calories: 150),
+        FoodItem(name: "Burger", calories: 400),
+        FoodItem(name: "Pasta", calories: 350),
+        FoodItem(name: "Steak", calories: 500),
+        FoodItem(name: "Ice Cream", calories: 250),
+        FoodItem(name: "Fries", calories: 200),
+        FoodItem(name: "Sushi", calories: 250),
+        FoodItem(name: "Chicken Sandwich", calories: 350),
+        FoodItem(name: "Cheese Cake", calories: 300),
+        FoodItem(name: "Smoothie", calories: 200),
+        FoodItem(name: "Apple", calories: 80),
+        FoodItem(name: "Chocolate Bar", calories: 150),
+        FoodItem(name: "Orange Juice", calories: 120),
+    ]
+    
+    
+    var body: some View {
+        NavigationView {
+            List {
+                Section(header: Text("Information")) {
+                    Text("This List shows information about foods and calories")
+                        .font(.headline)
+                }
+                
+                Section(header: Text("Food Items with Calorie Information")) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            
+                            
+                            ForEach(foodItems) { item in
+                                NavigationLink(destination: FoodItemDetailView(foodItem: item)) {
+                                    HStack {
+                                        Text(item.name)
+                                            .font(.headline)
+                                        Spacer()
+                                        Text("\(item.calories) calories")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                    
+                    .frame(height: 300) // Adjust the height as needed
+                }
+                
+                Section(footer: Text("Contact")) {
+                    Text("Please contact us")
+                        .font(.headline)
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .padding()
+        }
+    }
+}
+struct FoodItemDetailView: View {
+    let foodItem: FoodItem
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text(foodItem.name)
+                .font(.title)
+            Text("\(foodItem.calories) calories")
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .navigationBarTitle(foodItem.name)
+    }
+}
+
+```
+
+#### Gestures
+
+###### onTapGesture
+###### A gesture that detects a single tap or touch on a view, triggering an action when the tap occurs.
+
+```swift
+struct TapExample: View {
+    @State private var tapCount = 0
+
+    var body: some View {
+        VStack {
+            Text("Tap the rectangle below")
+                .padding(.bottom, 20)
+
+            Rectangle()
+                .fill(Color.orange)
+                .frame(width: 200, height: 100)
+                .cornerRadius(10)
+                .onTapGesture {
+                    tapCount += 1
+                }
+
+            Text("Taps: \(tapCount)")
+        }
+        .padding()
+    }
+}
+
+```
+###### onLongPressGesture
+
+###### A gesture that detects a long press or touch and hold on a view, triggering an action when the press is held for a specified duration.
+
+```swift
+
+struct LongPressExample: View {
+    @State private var isPressed = false
+
+    var body: some View {
+        VStack {
+            Text("Long press the rectangle below")
+                .padding(.bottom, 20)
+
+            Rectangle()
+                .fill(isPressed ? Color.orange : Color.pink)
+                .frame(width: 200, height: 100)
+                .cornerRadius(10)
+                .onLongPressGesture(minimumDuration: 1.0) {
+                    isPressed.toggle()
+                }
+        }
+        .padding()
+    }
+}
+```
+###### DragGesture
+
+###### A gesture that detects the movement of a view as the user drags their finger across the screen, allowing the view to follow the drag movement.
+
+```swift
+struct DragExample: View {
+    @State private var position = CGPoint(x: 100, y: 100)
+
+    var body: some View {
+        VStack {
+            Text("Drag the circle below")
+                .padding(.bottom, 20)
+
+            Circle()
+                .fill(Color.orange)
+                .frame(width: 100, height: 100)
+                .position(position)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            position = value.location
+                        }
+                        .onEnded { value in
+                            // You can add any additional logic here
+                        }
+                )
+        }
+        .padding()
+    }
+}
+
+
+
+```
+###### RotationGesture
+
+###### A gesture that detects the rotation of a view using two fingers, allowing the view to be rotated around its center point.
+
+
+```swift
+
+struct RotationExample: View {
+    @State private var angle: Angle = .degrees(0)
+
+    var body: some View {
+        VStack {
+            Text("Rotate the shape below")
+                .padding(.bottom, 20)
+
+            Rectangle()
+                .fill(Color.blue)
+                .frame(width: 200, height: 100)
+                .rotationEffect(angle)
+                .gesture(
+                    RotationGesture()
+                        .onChanged { value in
+                            angle = value
+                        }
+                        .onEnded { value in
+                            // You can add any additional logic here
+                        }
+                )
+        }
+        .padding()
+    }
+}
+
+
+
+
+```
+###### MagnificationGesture
+###### A gesture that detects the pinch-to-zoom action using two fingers, allowing the view to be scaled up or down based on the pinch motion.
+
+```swift
+struct MagnificationExample: View {
+    @State private var magnification: CGFloat = 1.0
+
+    var body: some View {
+        VStack {
+            Text("Pinch and zoom the image below")
+                .padding(.bottom, 20)
+            
+            Image("cat") // change image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 200 * magnification, height: 200 * magnification)
+                .gesture(
+                    MagnificationGesture()
+                        .onChanged { value in
+                            magnification = value.magnitude
+                        }
+                        .onEnded { value in
+                            // You can add any additional logic here
+                        }
+                )
+        }
+        .padding()
+    }
+}
+
+
+```
+
