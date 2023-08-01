@@ -2063,4 +2063,190 @@ print("Table size: \(table.size)")
 
 
 ```
+
  
+#### Delegate 
+
+```swift
+
+
+
+// Protocol for Weather updates
+protocol WeatherManagerDelegate: AnyObject {
+    func didUpdateWeather(_ weather: Weather)
+    func didFailWithError(_ error: Error)
+}
+
+// Weather Manager Class
+class WeatherManager {
+    
+    weak var delegate: WeatherManagerDelegate?
+    
+    func fetchWeatherData(for city: String) {
+        // Simulate API call and data retrieval
+        let temperature = 25.0
+        let weatherDescription = "Sunny"
+        let weather = Weather(temperature: temperature, description: weatherDescription)
+        
+        // Notify the delegate about the updated weather
+        delegate?.didUpdateWeather(weather)
+    }
+}
+
+// Weather Data Model
+struct Weather {
+    let temperature: Double
+    let description: String
+}
+
+// Weather View Controller
+class WeatherViewController: WeatherManagerDelegate {
+    
+    let weatherManager = WeatherManager()
+    
+    func viewDidLoad() {
+        weatherManager.delegate = self
+        
+        // Fetch weather data for a specific city
+        weatherManager.fetchWeatherData(for: "New York")
+    }
+    
+    func didUpdateWeather(_ weather: Weather) {
+        print("Temperature: \(weather.temperature)°C")
+        print("Description: \(weather.description)")
+    }
+    
+    func didFailWithError(_ error: Error) {
+    }
+}
+
+// Test using the WeatherViewController
+let weatherVC = WeatherViewController()
+weatherVC.viewDidLoad()
+
+ 
+```
+ 
+#### throwable functions 
+
+```swift
+
+enum DivideError: Error {
+    case divisionByZero
+}
+
+func divide(_ numerator: Int, by denominator: Int) throws -> Int {
+    guard denominator != 0 else {
+        throw DivideError.divisionByZero
+    }
+    
+    return numerator / denominator
+}
+
+do {
+    let result = try divide(10, by: 2)
+    print("Result: \(result)")
+} catch DivideError.divisionByZero {
+    print("Error: Division by zero is not allowed.")
+} catch {
+    print("An unknown error occurred.")
+}
+ 
+```
+ 
+#### Error Handling 
+
+```swift
+enum CustomError: Error {
+    case someError
+}
+
+func mayThrowError() throws {
+    throw CustomError.someError
+}
+
+//try
+do {
+    try mayThrowError()
+    print("Success")
+} catch {
+    print("Error: \(error)")
+}
+
+//try!
+let result = try! mayThrowError()
+print("Success: \(result)")
+
+//try?
+let result = try? mayThrowError()
+print("Result: \(result)") // Output: Result: nil
+
+```
+ 
+#### Functional programming 
+#### Map, filter and reduce
+
+```swift
+
+
+let numbers = [1, 5, 9, 12, 7, 3, 15]
+
+// Double each number
+let doubledNumbers = numbers.map { $0 * 2 }
+// Output: [2, 10, 18, 24, 14, 6, 30]
+
+// Use compactMap to convert strings to integers and filter out non-integer values
+let strings = ["1", "5", "9", "12", "7", "3", "15"]
+let convertedNumbers = strings.compactMap { Int($0) }
+// Output: [1, 5, 9, 12, 7, 3, 15]
+
+// Use flatMap to flatten the nested arrays into a single array (Note: 'numbers' is not a nested array)
+let flattenedArray = numbers.flatMap { [$0] }
+// Output: [1, 5, 9, 12, 7, 3, 15]
+
+// Filter numbers greater than 10
+let filteredNumbers = doubledNumbers.filter { $0 > 10 }
+// Output: [18, 24, 14, 30]
+
+// Sum all the remaining numbers
+let sum = filteredNumbers.reduce(0, +)
+// Output: 56 (18 + 24 + 14 + 30)
+
+print(sum) // Output: 56
+
+
+```
+ 
+###### Example 
+```swift
+
+struct Product {
+    let name: String
+    let price: Int
+    let category: String
+}
+
+func totalRevenueOf(products: [Product], category: String) -> Int {
+    let productsInCategory = products.filter { $0.category == category }
+    
+    let productPrices = productsInCategory.map { $0.price }
+    
+    return productPrices.reduce(0, +)
+}
+
+let products = [
+    Product(name: "iPhone", price: 1000, category: "Electronics"),
+    Product(name: "Headphones", price: 150, category: "Electronics"),
+    Product(name: "T-Shirt", price: 25, category: "Apparel"),
+    Product(name: "Jeans", price: 70, category: "Apparel"),
+    Product(name: "Book", price: 20, category: "Books"),
+]
+
+let result = totalRevenueOf(products: products, category: "Electronics")
+print("Total revenue for Electronics category: $\(result)")
+
+```
+ 
+###### Example 
+```swift
+
