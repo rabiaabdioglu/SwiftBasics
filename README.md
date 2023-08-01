@@ -40,9 +40,10 @@
   - [Optional Protocol](#optional-protocol)
   - [Property and newValue](#property-and-newvalue)
   - [didSet](#didset)
-
-
-## Swift Basics
+  - [Delegate](#delegate)
+  - [Error Handling](#error-handling)
+  - [Functional programming](#functional-programming)
+  - [Test](#test)
 
 
 
@@ -2249,4 +2250,110 @@ print("Total revenue for Electronics category: $\(result)")
  
 ###### Example 
 ```swift
+func add(_ a: Int, _ b: Int) -> Int {
+    return a + b
+}
 
+```
+ 
+#### Test 
+```swift
+import XCTest
+
+class MyMathTests: XCTestCase {
+
+    func testAddition() {
+        XCTAssertEqual(add(2, 3), 5, "Adding 2 and 3 should be equal to 5")
+        XCTAssertEqual(add(0, 0), 0, "Adding 0 and 0 should be equal to 0")
+        XCTAssertEqual(add(-5, 5), 0, "Adding -5 and 5 should be equal to 0")
+        XCTAssertEqual(add(10, -3), 7, "Adding 10 and -3 should be equal to 7")
+    }
+    
+    func testAdditionWithLargeNumbers() {
+        XCTAssertEqual(add(1000000, 500000), 1500000, "Adding large numbers should work correctly")
+    }
+
+    static var allTests = [
+        ("testAddition", testAddition),
+        ("testAdditionWithLargeNumbers", testAdditionWithLargeNumbers)
+    ]
+}
+
+// Run the tests
+XCTMain([testCase(MyMathTests.allTests)])
+```
+#### Using Fakes
+###### Using fakes, also known as test doubles, is a technique in unit testing where you replace certain dependencies or collaborators of the code being tested with simplified implementations that provide controlled and predictable behavior. 
+
+
+###### Example 
+
+```swift
+import XCTest
+
+// Protocol to represent a data repository
+protocol DataRepository {
+    func fetchData() -> [String]
+}
+
+// Real implementation of the data repository
+class RealDataRepository: DataRepository {
+    func fetchData() -> [String] {
+        // Simulate fetching data from a database or network
+        // For this example, we will return some hardcoded data
+        return ["Item 1", "Item 2", "Item 3"]
+    }
+}
+
+// Fake implementation of the data repository for testing
+class FakeDataRepository: DataRepository {
+    func fetchData() -> [String] {
+        // Return different data for testing purposes
+        return ["Test Item 1", "Test Item 2", "Test Item 3"]
+    }
+}
+
+// Example of a class that uses the data repository
+class DataManager {
+    private let repository: DataRepository
+    
+    init(repository: DataRepository) {
+        self.repository = repository
+    }
+    
+    func displayData() -> [String] {
+        return repository.fetchData()
+    }
+}
+
+// Unit Tests
+class DataManagerTests: XCTestCase {
+    func testRealData() {
+        let realRepository = RealDataRepository()
+        let dataManager = DataManager(repository: realRepository)
+        let data = dataManager.displayData()
+        XCTAssertEqual(data, ["Item 1", "Item 2", "Item 3"])
+    }
+    
+    func testFakeData() {
+        let fakeRepository = FakeDataRepository()
+        let dataManager = DataManager(repository: fakeRepository)
+        let data = dataManager.displayData()
+        XCTAssertEqual(data, ["Test Item 1", "Test Item 2", "Test Item 3"])
+    }
+}
+
+// Run the tests
+DataManagerTests.defaultTestSuite.run()
+
+
+```
+ 
+## Working With Data 
+```swift
+
+
+
+
+```
+ 
