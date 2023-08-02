@@ -44,7 +44,12 @@
   - [Error Handling](#error-handling)
   - [Functional programming](#functional-programming)
   - [Test](#test)
-
+- [Working With Data](#working-with-data)
+  - [URL](#url)
+  - [HTTP Request](#http-request)
+  - [JSON](#json)
+  - [JSON Decoding](#json-decoding)
+  - [Core Data](#core-data)
 
 
 ####  Swift Variable Examples
@@ -2257,6 +2262,7 @@ func add(_ a: Int, _ b: Int) -> Int {
 ```
  
 #### Test 
+
 ```swift
 import XCTest
 
@@ -2349,11 +2355,449 @@ DataManagerTests.defaultTestSuite.run()
 
 ```
  
-## Working With Data 
+## Working With Data
+
+
+#### URL
+
+
+
+###### URLComponents
+
+
+###### Scheme: Describes the protocol of the website 
+
+###### Host: Sets the main domain name
+
+###### Path: Defines the particular website component, like images
+
 ```swift
+
+
+
+var components = URLComponents()
+components.scheme = "https"
+components.host = "google.com"
+components.path = "/images"
+let url = components.url
+
+
+
+```
+
+###### URLSessionDownloadTask
+
+```swift
+import Foundation
+
+let imageURLString = "https://www.example.com/image.jpg"
+guard let imageURL = URL(string: imageURLString) else {
+    fatalError("Invalid URL")
+}
+
+let task = URLSession.shared.downloadTask(with: imageURL) { localURL, response, error in
+    if let error = error {
+        print("Error: \(error)")
+        return
+    }
+
+    guard let localURL = localURL else {
+        print("No file downloaded")
+        return
+    }
+
+    // Handle the downloaded file at 'localURL'
+}
+
+task.resume()
+
+
+```
+
+
+#### HTTP Request 
+
+
+###### Basic HTTP Request and JSON Data Handling Example in Swift 
+
+
+```swift
+
+import Foundation
+
+struct Todo: Codable {
+    let userId: Int
+    let id: Int
+    let title: String
+    let completed: Bool
+}
+
+let todoUrlString = "https://jsonplaceholder.typicode.com/todos/1"
+guard let todoUrl = URL(string: todoUrlString) else {
+    fatalError("Invalid URL")
+}
+
+let task = URLSession.shared.dataTask(with: todoUrl) { data, response, error in
+    if let error = error {
+        print("Error: \(error)")
+        return
+    }
+    
+    guard let data = data else {
+        print("No data received")
+        return
+    }
+    
+    do {
+        let todo = try JSONDecoder().decode(Todo.self, from: data)
+        print("UserId: \(todo.userId)")
+        print("Id: \(todo.id)")
+        print("Title: \(todo.title)")
+        print("Completed: \(todo.completed)")
+    } catch {
+        print("Error decoding JSON: \(error)")
+    }
+}
+
+task.resume()
+
+
+
+```
+ 
+
+
+#### JSON
+
+###### Basic Example
+
+
+
+
+```swift
+
+import Foundation
+
+
+// JSON mapped using custom property names
+
+let JSONExample = """
+{
+    "username": "rbdgl",
+    "name": "Rabia",
+    "email" : "rabiabdglu@gmail.com",
+    "url" : "https://github.com/rabiaabdioglu/SwiftBasics"
+}
+"""
+
+struct User: Decodable {
+    enum CodingKeys: String, CodingKey { case
+        username, name, email,
+        url = "url"
+    }
+    
+    
+    let username: String
+    let name: String
+    let email: String
+    let url: String
+    }
+
+let data = JSONExample.data(using: .utf8)!
+let user = try! JSONDecoder().decode(User.self, from: data)
+print(user)
+
+
+
+```
+ 
+#### JSON Decoding
+
+
+```swift
+
+
+import Foundation
+
+let booksJSONString = """
+[
+    {
+        "title": "1984",
+        "author": "George Orwell",
+        "genre": "Dystopian",
+        "rating": 4.8
+    },
+    {
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "genre": "Classic",
+        "rating": 4.9
+    },
+    {
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "genre": "Classic",
+        "rating": 4.7
+    }
+]
+"""
+
+struct Book: Decodable {
+    let title: String
+    let author: String
+    let genre: String
+    let rating: Double
+}
+
+let booksData = Data(booksJSONString.utf8)
+let decoder = JSONDecoder()
+let books = try! decoder.decode([Book].self, from: booksData)
+books.forEach {
+    print("\($0.title) by \($0.author) - Genre: \($0.genre), Rating: \($0.rating)")
+}
+
+```
+ 
+#### Fetch Image from JSON API in SwiftUI
+
+###### This SwiftUI code demonstrates how to fetch images from a JSON API by entering an index and displaying the corresponding image
+```swift
+
+
+import SwiftUI
+
+// Define a struct to represent the image data
+struct ImageData: Decodable {
+    let id: Int
+    let title: String
+    let url: URL
+}
+
+struct ImageView: View {
+    @State private var image: Image? // Placeholder image
+    @State private var indexText: String = ""
+    
+    var body: some View {
+        VStack {
+            TextField("Enter index", text: $indexText)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+            
+            Button("Get Image") {
+                fetchImage()
+            }
+            
+            if let image = image {
+                image
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .scaledToFit()
+            }
+        }
+        .padding()
+    }
+    
+    func fetchImage() {
+        guard let index = Int(indexText) else {
+            print("Invalid index")
+            return
+        }
+        
+        let jsonURLString = "https://jsonplaceholder.typicode.com/photos"
+        
+        guard let url = URL(string: jsonURLString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching data: \(error)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                let imageArray = try JSONDecoder().decode([ImageData].self, from: data)
+                if let requestedImage = imageArray.first(where: { $0.id == index }),
+                   let imageData = try? Data(contentsOf: requestedImage.url),
+                   let uiImage = UIImage(data: imageData) {
+                    DispatchQueue.main.async {
+                        self.image = Image(uiImage: uiImage)
+                    }
+                } else {
+                    print("Failed to fetch and display the image")
+                }
+            } catch {
+                print("Error decoding JSON: \(error)")
+            }
+        }.resume()
+    }
+}
+
+struct JSONImage: View {
+    var body: some View {
+        VStack {
+            Text("Fetched Image:")
+            ImageView()
+        }
+    }
+}
+
+struct JSONImage_Previews: PreviewProvider {
+    static var previews: some View {
+        JSONImage()
+    }
+}
 
 
 
 
 ```
  
+#### Core Data
+
+###### Core Data entities and relationships
+
+
+###### One-to-One
+###### A one-to-one relationship means that each instance of one entity is related to one instance of another entity. For example, a "Person" entity may have a one-to-one relationship with an "Address" entity.
+######
+###### One-to-Many
+###### A one-to-many relationship signifies that each instance of one entity is related to multiple instances of another entity. For instance, a "Department" entity may have a one-to-many relationship with "Employees" entities.
+######
+###### Many-to-Many
+###### A many-to-many relationship represents that each instance of one entity can be related to multiple instances of another entity, and vice versa. For example, a "Student" entity may have a many-to-many relationship with a "Course" entity.
+
+
+
+###### Fetching from Core Data
+
+
+```swift
+
+
+swift
+import CoreData
+
+func fetchNotes() -> [Note] {
+    let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
+    do {
+        let notes = try context.fetch(request)
+        return notes.map { Note(id: $0.id, title: $0.title ?? "", content: $0.content ?? "") }
+    } catch {
+        print("Error fetching notes: \(error)")
+        return []
+    }
+}
+
+
+```
+
+###### Update Data in Core Data
+
+
+
+```swift
+
+
+swift
+func updateNote(note: Note) {
+    let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
+    request.predicate = NSPredicate(format: "id == %@", note.id as CVarArg)
+    do {
+        let result = try context.fetch(request)
+        if let existingNote = result.first {
+            existingNote.title = note.title
+            existingNote.content = note.content
+            try context.save()
+        }
+    } catch {
+        print("Error updating note: \(error)")
+    }
+}
+```
+
+###### Delete Data in Core Data
+
+
+```swift
+
+swift
+func deleteNote(note: Note) {
+    let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
+    request.predicate = NSPredicate(format: "id == %@", note.id as CVarArg)
+    do {
+        let result = try context.fetch(request)
+        if let existingNote = result.first {
+            context.delete(existingNote)
+            try context.save()
+        }
+    } catch {
+        print("Error deleting note: \(error)")
+    }
+}
+
+```
+
+###### Filtering
+
+
+```swift
+
+func fetchPersonsWithNameContainingNur() -> [Person] {
+    let fetchRequest: NSFetchRequest<Person> = Person.fetchRequest()
+    
+    let predicate = NSPredicate(format: "name CONTAINS[c] %@", "el")
+    
+    fetchRequest.predicate = predicate
+    
+    do {
+        let personsWithNameContainingNur = try context.fetch(fetchRequest)
+        return personsWithNameContainingNur
+    } catch {
+        print("Error fetching persons with name containing 'nur': \(error)")
+        return []
+    }
+}
+
+
+```
+ 
+###### Sorting
+
+
+```swift
+
+
+// Function to fetch sorted persons using NSSortDescriptor
+func fetchSortedPersons() -> [Person] {
+    let fetchRequest: NSFetchRequest<Person> = Person.fetchRequest()
+    
+    // Create the sort descriptor
+    let sortDescriptor = NSSortDescriptor(key: "name", ascending: true,selector: #selector(NSString.localizedCompare))
+    
+    // Set the sort descriptors in the fetch request
+    fetchRequest.sortDescriptors = [sortDescriptor]
+    
+    do {
+        // Fetch the sorted persons
+        let sortedPersons = try context.fetch(fetchRequest)
+        return sortedPersons
+    } catch {
+        print("Error fetching sorted persons: \(error)")
+        return []
+    }
+}
+
+```
+
+
+
