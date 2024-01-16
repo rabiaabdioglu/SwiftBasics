@@ -2483,9 +2483,9 @@ import Foundation
 
 let JSONExample = """
 {
-    "username": "rbdgl",
-    "name": "Rabia",
-    "email" : "rabiabdglu@gmail.com",
+    "username": "xxxxx",
+    "name": "XXX",
+    "email" : "xxxx@gmail.com",
     "url" : "https://github.com/rabiaabdioglu/SwiftBasics"
 }
 """
@@ -2684,7 +2684,7 @@ struct JSONImage_Previews: PreviewProvider {
 ```swift
 
 
-swift
+
 import CoreData
 
 func fetchNotes() -> [Note] {
@@ -2708,7 +2708,7 @@ func fetchNotes() -> [Note] {
 ```swift
 
 
-swift
+
 func updateNote(note: Note) {
     let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", note.id as CVarArg)
@@ -2730,7 +2730,7 @@ func updateNote(note: Note) {
 
 ```swift
 
-swift
+
 func deleteNote(note: Note) {
     let request: NSFetchRequest<NoteEntity> = NoteEntity.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", note.id as CVarArg)
